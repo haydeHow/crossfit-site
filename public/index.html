@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrossFit Workout</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    </link>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+
+<body>
+    <header>
+        <!-- logo start-->
+        <div class="logo-container">
+
+
+            <!-- flag -->
+            <div class="flag-container">
+                <img src="images/american_flag.jpg" class="responsive-image">
+            </div>
+        </div>
+        <!-- logo end -->
+
+
+        <!--- date -->
+        <div class="date">
+            <p id="date"></p>
+        </div>
+
+
+        <!-- paypal 
+
+
+        <div class="paypal-container">
+            <form action="https://www.paypal.com/donate" method="post" target="_blank">
+                <input type="hidden" name="hosted_button_id" value="YOUR_PAYPAL_BUTTON_ID">
+                <button type="submit" class="paypal-button">Donate with PayPal</button>
+            </form>
+        </div>
+    -->
+
+    </header>
+    <div class="workout-container">
+        <!-- warmup -->
+        <div class="workout" id="warmup-section">
+            <h2>Warm-Up</h2>
+            <p class="exercise" id="warmup-exercise1"></p>
+            <p class="exercise" id="warmup-exercise2"></p>
+        </div>
+
+        <!-- olympic lift -->
+        <div class="workout" id="olympic-section">
+            <h2>Olympic Lift</h2>
+            <p class="exercise" id="olympic-description"></p>
+            <p class="exercise" id="olympic-exercise1"></p>
+            <p class="exercise" id="olympic-exercise2"></p>
+        </div>
+
+        <!-- wod -->
+        <div class="workout" id="wod-section">
+            <h2>Workout of the Day (WOD)</h2>
+            <p class="exercise" id="wod-description"></p>
+            <p class="exercise" id="wod-exercise1"></p>
+            <p class="exercise" id="wod-exercise2"></p>
+            <p class="exercise" id="wod-exercise3"></p>
+        </div>
+
+
+
+
+        <div class="workout" id="cooldown-section">
+            <h2>Cool Down</h2>
+            <p class="exercise" id="cooldown-exercise1"></p>
+            <p class="exercise" id="cooldown-exercise2"></p>
+        </div>
+    </div>
+
+
+    <footer>Stay active, stay healthy.</footer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
