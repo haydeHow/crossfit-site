@@ -1,0 +1,151 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'SF Pro Display', sans-serif;
+}
+body {
+    background-color: #F5F5F7;
+    color: #1C1C1E;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 20px;
+}
+header {
+    font-weight: 600;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.workout-container {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 600px;
+    padding: 20px 30px;
+}
+.workout {
+    margin-bottom: 20px;
+}
+.workout h2 {
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+.exercise {
+    font-weight: 400;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #636366;
+}
+footer {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #8E8E93;
+}
+
+.paypal-button {
+    display: inline-block;
+    border-radius: 6px;
+    background-color: #0070ba;
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+  }
+  
+  .button-link {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .paypal-logo {
+    height: 24px;
+    width: auto;
+  }
+  .venmo-logo {
+    height: 24px;
+    width: auto;
+  }
+  
+  .paypal-button:hover {
+    background-color: #005ea6;
+  }
+
+  .stripe-button {
+    display: inline-block;
+    border-radius: 6px;
+    background-color: #635bff; /* Stripe's signature color */
+    padding: 10px 20px;
+    transition: background-color 0.3s;
+  }
+  
+  .button-link {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .stripe-logo {
+    height: 24px;
+    width: auto;
+  }
+  
+  .stripe-button:hover {
+    background-color: #4b43c4; /* Darker shade for hover effect */
+  }
+
+  .venmo-button {
+    display: inline-block;
+    border-radius: 6px;
+    background-color: #008CFF; /* Venmo's signature blue */
+    padding: 10px 20px;
+    color: #ffffff; /* White text */
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s;
+  }
+  
+  .venmo-button:hover {
+    background-color: #357ABD; /* Darker blue for hover effect */
+  }
+  
+  
+  .payment-buttons {
+    gap: 10px; /* Adjust space between buttons */
+    padding: 10px;
+    padding-top: 30px;
+    float: right;
+  }
+
+  
+.oval-image {
+  width: 150px; /* Adjust the width as needed */
+  height: 150px; /* Adjust the height as needed */
+  object-fit: cover; /* Ensures the image covers the oval shape */
+  border-radius: 50%; /* Makes the image oval */
+}
+  
+.top-container {
+  width: 600px; /* Set the width of the container, e.g., 80% of the parent element */
+  margin-top: -30px;
+}
+
+.date {
+  position: relative;
+  top: 70px;
+  left: 10px;
+}
