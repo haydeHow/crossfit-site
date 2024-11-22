@@ -1,8 +1,9 @@
 from flask import Flask, jsonify, request
-import configparser
 import psycopg2
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # This will enable CORS for all routes
 
 # Database connection details
 DB_HOST = "localhost"
@@ -37,15 +38,16 @@ def get_data():
     for row in rows:
         data.append({
             "id": row[0],
-            "date": row[1],
-            "warmup_description": row[2], 
-            "warmup_movements": row[3], 
-            "strength_description": row[4], 
-            "strength_movements": row[5], 
-            "wod_description": row[6], 
-            "wod_movements": row[7], 
-            "cooldown_description": row[8], 
-            "cooldown_movements": row[9]
+            "date_api": row[1],
+            "date": row[2], 
+            "warmup_description": row[3], 
+            "warmup_movements": row[4], 
+            "strength_description": row[5], 
+            "strength_movements": row[6], 
+            "wod_description": row[7], 
+            "wod_movements": row[8], 
+            "cooldown_description": row[9], 
+            "cooldown_movements": row[10]
         })
 
     return jsonify(data)
