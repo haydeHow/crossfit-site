@@ -2,25 +2,20 @@
 
 const express = require('express');
 const jwt = require('jsonwebtoken');
-
 const { Pool } = require('pg');
 const path = require("path");
+const cors = require('cors');
+const morgan = require('morgan'); 
+const fs = require('fs');
+
+
 require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
-
-// Use a strong, secure secret key for JWT
 const SECRET_KEY = 'your-secret-key';
-
-let json_token = null;
-
-// Middleware to parse JSON bodies
-app.use(express.json());
-
-// Dummy user data (replace with a database in production)
+const logStorage = [];
 const users = [{ username: 'admin', password: 'password123' }];
-
 // Configure the database pool
 const pool = new Pool({
     user: process.env.PGUSER,
@@ -29,6 +24,23 @@ const pool = new Pool({
     password: process.env.PGPASSWORD,
     port: process.env.PGPORT,
 });
+
+
+// Custom stream to write logs to memory
+const logStream = {
+  write: (message) => {
+    logStorage.push(message.trim());
+  },
+};
+
+let json_token = null;
+
+// Middleware to parse JSON bodies
+app.use(express.json());
+app.use(cors());
+app.use(morgan('dev')); // Logs concise colored output (good for development)
+
+
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -69,6 +81,16 @@ const checkCustomHeader = (req, res, next) => {
 
     next(); // Continue to the next middleware or route handler
 };
+
+const authenticate_log = (req, res, next) => {
+    const token = req.headers['x-api-key'];
+    if (token === '1234') {
+      next();
+    } else {
+      res.status(403).json({ message: 'Forbidden: Invalid API Key' });
+    }
+  };
+
 
 
 // Login route
@@ -142,6 +164,10 @@ app.get('/proxy-post', async (req, res) => {
     }
 
 });
+
+app.get('/logs', authenticate_log, (req, res) => {
+    res.json(logStorage);
+  });
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
