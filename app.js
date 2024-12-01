@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 const path = require("path");
 const cors = require('cors');
-const morgan = require('morgan'); 
+const morgan = require('morgan');
 const fs = require('fs');
 
 
@@ -28,9 +28,9 @@ const pool = new Pool({
 
 // Custom stream to write logs to memory
 const logStream = {
-  write: (message) => {
-    logStorage.push(message.trim());
-  },
+    write: (message) => {
+        logStorage.push(message.trim());
+    },
 };
 
 let json_token = null;
@@ -85,11 +85,11 @@ const checkCustomHeader = (req, res, next) => {
 const authenticate_log = (req, res, next) => {
     const token = req.headers['x-api-key'];
     if (token === '1234') {
-      next();
+        next();
     } else {
-      res.status(403).json({ message: 'Forbidden: Invalid API Key' });
+        res.status(403).json({ message: 'Forbidden: Invalid API Key' });
     }
-  };
+};
 
 
 
@@ -109,12 +109,8 @@ app.post('/login', (req, res) => {
 // Example route protected by the header check
 app.get('/data', checkCustomHeader, async (req, res) => {
     try {
-        const date = new Date();
-        const year = date.getFullYear().toString().slice(-2);
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const formattedDate = `${month}/${day}/${year}`;
-        // console.log(formattedDate);
+        const currentDate = new Date();
+        const formattedDate = `${String(currentDate.getMonth() + 1).padStart(2, '0')}/${String(currentDate.getDate()).padStart(2, '0')}/${String(currentDate.getFullYear()).slice(-2)}`;
         const result = await pool.query(`
             SELECT * 
             FROM workouts
@@ -150,7 +146,7 @@ app.get('/proxy-post', async (req, res) => {
     try {
         const response = await fetch('http://localhost:3000/data', {
             method: 'GET',
-            headers: { 'password': `${json_token}`},
+            headers: { 'password': `${json_token}` },
         });
 
         if (!response.ok) {
@@ -159,6 +155,7 @@ app.get('/proxy-post', async (req, res) => {
 
         data = await response.json();
         res.send(data);
+        console.log(data);
     } catch (error) {
         console.error('Error:', error.message);
     }
@@ -167,7 +164,7 @@ app.get('/proxy-post', async (req, res) => {
 
 app.get('/logs', authenticate_log, (req, res) => {
     res.json(logStorage);
-  });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
