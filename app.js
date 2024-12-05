@@ -1,5 +1,5 @@
 
-
+// DEPENDENCIES
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
@@ -11,12 +11,11 @@ const fs = require('fs');
 
 require('dotenv').config();
 
+// CONSTANTS
 const app = express();
 const PORT = 3000;
 const SECRET_KEY = 'your-secret-key';
-const logStorage = [];
 const users = [{ username: 'admin', password: 'password123' }];
-// Configure the database pool
 const pool = new Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,
@@ -24,27 +23,15 @@ const pool = new Pool({
     password: process.env.PGPASSWORD,
     port: process.env.PGPORT,
 });
-
-
-// Custom stream to write logs to memory
-const logStream = {
-    write: (message) => {
-        logStorage.push(message.trim());
-    },
-};
-
 let json_token = null;
 
+// MIDDLEWARE
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cors());
 app.use(morgan('dev')); // Logs concise colored output (good for development)
-
-
-
 // Middleware to parse JSON
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -127,7 +114,7 @@ app.get('/data', checkCustomHeader, async (req, res) => {
 // Client function to test the login endpoint
 app.get('/proxy-post', async (req, res) => {
     try {
-        const response = await fetch('https://dailycrossfitprogramming.com/login', {
+        const response = await fetch('http://localhost:3000/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: 'admin', password: 'password123' })
@@ -144,7 +131,7 @@ app.get('/proxy-post', async (req, res) => {
 
     let data = null;
     try {
-        const response = await fetch('https://dailycrossfitprogramming.com/data', {
+        const response = await fetch('http://localhost:3000/data', {
             method: 'GET',
             headers: { 'password': `${json_token}` },
         });
@@ -162,12 +149,6 @@ app.get('/proxy-post', async (req, res) => {
 
 });
 
-app.get('/logs', authenticate_log, (req, res) => {
-    res.json(logStorage);
-});
-
 app.listen(PORT, () => {
-    console.log(`Server is running on https://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-module.exports = app;
