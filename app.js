@@ -127,7 +127,7 @@ app.get('/data', checkCustomHeader, async (req, res) => {
 // Client function to test the login endpoint
 app.get('/proxy-post', async (req, res) => {
     try {
-        const response = await fetch('http://localhost:3000/login', {
+        const response = await fetch('https://dailycrossfitprogramming.com/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: 'admin', password: 'password123' })
@@ -144,7 +144,7 @@ app.get('/proxy-post', async (req, res) => {
 
     let data = null;
     try {
-        const response = await fetch('http://localhost:3000/data', {
+        const response = await fetch('https://dailycrossfitprogramming.com/data', {
             method: 'GET',
             headers: { 'password': `${json_token}` },
         });
@@ -167,5 +167,5 @@ app.get('/logs', authenticate_log, (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on https://localhost:${PORT}`);
 });
