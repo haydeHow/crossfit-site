@@ -135,7 +135,7 @@
 
     // Function to fetch data from the API
     function fetchData() {
-        fetch('http://dailycrossfitprogramming.com/proxy-post')
+        fetch('https://dailycrossfitprogramming.com/proxy-post')
             .then(response => response.json())
             .then(data => {
                 document.getElementById("date_api").innerHTML = `<h2 class="date">${data[0]['date']}</h2>`;
