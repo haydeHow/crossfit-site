@@ -169,3 +169,5 @@ app.get('/logs', authenticate_log, (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on https://localhost:${PORT}`);
 });
+
+module.exports = app;
