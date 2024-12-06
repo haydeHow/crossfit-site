@@ -1,154 +1,67 @@
-
-// DEPENDENCIES
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
 const path = require("path");
-const cors = require('cors');
-const morgan = require('morgan');
-const fs = require('fs');
 
-
-require('dotenv').config();
-
-// CONSTANTS
 const app = express();
 const PORT = 3000;
-const SECRET_KEY = 'your-secret-key';
-const users = [{ username: 'admin', password: 'password123' }];
-const pool = new Pool({
-    user: process.env.PGUSER,
-    host: process.env.PGHOST,
-    database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
-    port: process.env.PGPORT,
-});
-let json_token = null;
 
-// MIDDLEWARE
-// Middleware to parse JSON bodies
-app.use(express.json());
-app.use(cors());
-app.use(morgan('dev')); // Logs concise colored output (good for development)
-// Middleware to parse JSON
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
+// Simulated database of API keys
+const validApiKeys = new Set(['12345', '67890']); // Replace with secure storage in production
+
+// Middleware to validate API key
+function authenticateApiKey(req, res, next) {
+    const apiKey = req.headers['x-api-key']; // API key is expected in the 'x-api-key' header
+
+    if (!apiKey) {
+        return res.status(401).json({ message: 'API key is missing' });
+    }
+
+    if (!validApiKeys.has(apiKey)) {
+        return res.status(403).json({ message: 'Invalid API key' });
+    }
+
+    next(); // API key is valid, proceed to the next middleware or route
+}
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+app.get('/proxy', async (req, res) => {
 
+    try {
+        const response = await fetch('http://localhost:3000/secure-data', {
+            headers: {
+                'x-api-key': '12345', // Replace with your API key
+            },
+        });
 
-// Function to generate a JWT
-function generateToken(payload) {
-    return jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
-}
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status}`);
+        }
 
-// Middleware to authenticate and verify the token
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Extract token from Bearer <token>
-    if (!token) return res.status(401).json({ message: 'Access Denied' });
+        const data = await response.json();
+        output.textContent = JSON.stringify(data, null, 2);
+    } catch (error) {
+        output.textContent = error.message;
+    }
+});
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-        if (err) return res.status(403).json({ message: 'Invalid Token' });
-        req.user = user; // Attach user payload to the request
-        next();
+// Protected route
+app.get('/secure-data', authenticateApiKey, (req, res) => {
+    res.json({
+        message: 'Access granted to secure data',
+        data: {
+            example: 'This is sensitive information',
+        },
     });
-}
-
-const checkCustomHeader = (req, res, next) => {
-    const requiredHeader = req.headers['password']; // Replace 'x-custom-header' with your desired header key
-
-    if (!requiredHeader || requiredHeader !== `${json_token}`) {
-        return res.status(403).json({ message: 'Forbidden: Invalid or missing header' });
-    }
-
-    next(); // Continue to the next middleware or route handler
-};
-
-const authenticate_log = (req, res, next) => {
-    const token = req.headers['x-api-key'];
-    if (token === '1234') {
-        next();
-    } else {
-        res.status(403).json({ message: 'Forbidden: Invalid API Key' });
-    }
-};
-
-
-
-// Login route
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Check user credentials
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) return res.status(401).json({ message: 'Invalid Credentials' });
-
-    // Generate a token with the user's information
-    const token = generateToken({ username: user.username });
-    res.json({ token });
 });
 
-// Example route protected by the header check
-app.get('/data', checkCustomHeader, async (req, res) => {
-    try {
-        const currentDate = new Date();
-        const formattedDate = `${String(currentDate.getMonth() + 1).padStart(2, '0')}/${String(currentDate.getDate()).padStart(2, '0')}/${String(currentDate.getFullYear()).slice(-2)}`;
-        const result = await pool.query(`
-            SELECT * 
-            FROM workouts
-            WHERE date_api = $1
-            `, [formattedDate]);
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Database query failed' });
-    }
-});
-
-
-// Client function to test the login endpoint
-app.get('/proxy-post', async (req, res) => {
-    try {
-        const response = await fetch('http://localhost:3000/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: 'admin', password: 'password123' })
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        json_token = await response.json();
-    } catch (error) {
-        console.error('Error:', error.message);
-    }
-
-    let data = null;
-    try {
-        const response = await fetch('http://localhost:3000/data', {
-            method: 'GET',
-            headers: { 'password': `${json_token}` },
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        data = await response.json();
-        res.send(data);
-        // console.log(data);
-    } catch (error) {
-        console.error('Error:', error.message);
-    }
-
-});
-
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
