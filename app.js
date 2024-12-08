@@ -33,33 +33,49 @@ app.get('/', (req, res) => {
 
 app.get('/proxy', async (req, res) => {
 
-    try {
-        const response = await fetch('http://localhost:3000/secure-data', {
-            headers: {
-                'x-api-key': '12345', // Replace with your API key
-            },
-        });
+    const response = await fetch('http://localhost:3000/secure-data', {
+        headers: {
+            'x-api-key': '12345', // Replace with your API key
+        },
+    });
 
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        output.textContent = JSON.stringify(data, null, 2);
-    } catch (error) {
-        output.textContent = error.message;
+    if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
     }
+
+    const data = await response.json();
+    res.send(data);
 });
 
 // Protected route
-app.get('/secure-data', authenticateApiKey, (req, res) => {
-    res.json({
-        message: 'Access granted to secure data',
-        data: {
-            example: 'This is sensitive information',
-        },
-    });
+// Protected route
+app.get('/secure-data', authenticateApiKey, async (req, res) => {
+    try {
+        const { createClient } = require('@supabase/supabase-js');
+
+        // Initialize Supabase client
+        const supabaseUrl = 'https://rfwfgsjhvnpniknvhzng.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmd2Znc2podm5wbmlrbnZoem5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM0MjU3MzEsImV4cCI6MjA0OTAwMTczMX0.ga4eAXCvELr1SBAVI2siU-K1aXXdr6iw3VswxOjEsDE';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Fetch all users
+        const { data, error } = await supabase
+            .from('users')  // Table name
+            .select('*');   // Select all columns
+
+        if (error) {
+            console.error('Error fetching users:', error);
+            return res.status(500).json({ error: 'Failed to fetch users.' });
+        }
+
+        // Send the fetched data as a response
+        res.json(data);
+    } catch (err) {
+        console.error('Unexpected error:', err);
+        res.status(500).json({ error: 'An unexpected error occurred.' });
+    }
 });
+
 
 // Start the server
 app.listen(PORT, () => {

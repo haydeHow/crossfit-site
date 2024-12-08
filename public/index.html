@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
+<p id="data"></p>
+
 
 <body>
 
@@ -131,4 +133,26 @@
     // window.onload = fetchData;
 
 </script>
+<script>
+
+async function fetchData() {
+    try {
+        const response = await fetch('http://localhost:3000/proxy'); // Add protocol
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        // Convert data to JSON string for display
+        document.getElementById("data").innerHTML = JSON.stringify(data, null, 2);
+    } catch (error) {
+        // Handle errors
+        document.getElementById("data").textContent = `Error: ${error.message}`;
+    }
+}
+
+// Call fetchData on window load
+window.onload = fetchData;
+
+</script>
+
 </html>
