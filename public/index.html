@@ -6,13 +6,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 
-<p id="data"></p>
-
 
 <body>
 
     <div class="logo-container">
-        <img src="dailycrossfit.jpg" alt="Logo" class="oval-image">
+        <img src="Free Crossfit.jpg" alt="Logo" class="oval-image">
     </div>
 
     <div class="top-container">
@@ -21,7 +19,7 @@
 
 
         <div class="payment-buttons">
-            <h4 class="donate">Donations ❤️</h4>
+            <h4 class="donate">Donations❤️</h4>
             <div class="payment-button paypal-button">
                 <a href="https://www.paypal.com" target="_blank" class="button-link">
                     <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo"
@@ -80,78 +78,67 @@
 </body>
 
 <script>
-    // function shouldLoadData() {
-    //   const lastLoaded = localStorage.getItem('lastLoadedDate');
-    //  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+    function shouldLoadData() {
+        const lastLoaded = localStorage.getItem('lastLoadedDate');
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
-    // Load data if there's no lastLoaded date or it's a different day
-    // return !lastLoaded || lastLoaded !== today;
-    // }
+        // Load data if there's no lastLoaded date or it's a different day
+        return !lastLoaded || lastLoaded !== today;
+    }
 
 
     // Function to fetch data from the API
-    // function fetchData() {
-    // fetch('http://localhost:3000/data')
-    //   .then(response => response.json())
-    //  .then(data => {
-    //     document.getElementById("date_api").innerHTML = `<h2 class="date">${data[0]['date']}</h2>`;
+    function fetchData() {
+        fetch('http://localhost:3000/proxy', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("date_api").innerHTML = `<h2 class="date">${data[0]['date']}</h2>`;
 
-    //    document.getElementById("warmup_description_api").innerHTML = `<p class="exercise">${data[0]['warmup_description']}</p>`;
-    //   document.getElementById("strength_description_api").innerHTML = `<p class="exercise">${data[0]['strength_description']}</p>`;
-    //  document.getElementById("wod_description_api").innerHTML = `<p class="exercise">${data[0]['wod_description']}</p>`;
-    // document.getElementById("cooldown_description_api").innerHTML = `<p class="exercise">${data[0]['cooldown_description']}</p>`;
+                document.getElementById("warmup_description_api").innerHTML = `<p class="exercise">${data[0]['warmup_description']}</p>`;
+                document.getElementById("strength_description_api").innerHTML = `<p class="exercise">${data[0]['strength_description']}</p>`;
+                document.getElementById("wod_description_api").innerHTML = `<p class="exercise">${data[0]['wod_description']}</p>`;
+                document.getElementById("cooldown_description_api").innerHTML = `<p class="exercise">${data[0]['cooldown_description']}</p>`;
 
 
-    // let warmup_movements = data[0]['warmup_movements'];
-    // let strength_movements = data[0]['strength_movements'];
-    // let wod_movements = data[0]['wod_movements'];
-    // let cooldown_movements = data[0]['cooldown_movements'];
+                let warmup_movements = data[0]['warmup_movements'];
+                let strength_movements = data[0]['strength_movements'];
+                let wod_movements = data[0]['wod_movements'];
+                let cooldown_movements = data[0]['cooldown_movements'];
 
-    // let warmup_content = "";
-    // let strength_content = "";
-    // let wod_content = "";
-    // let cooldown_content = "";
+                let warmup_content = "";
+                let strength_content = "";
+                let wod_content = "";
+                let cooldown_content = "";
 
-    // for (const i in warmup_movements)
-    // warmup_content += `<p class="exercise">- ${warmup_movements[i]}</p>`;
-    // for (const i in strength_movements)
-    // strength_content += `<p class="exercise">- ${strength_movements[i]}</p>`;
-    // for (const i in wod_movements)
-    // wod_content += `<p class="exercise">- ${wod_movements[i]}</p>`;
-    // for (const i in cooldown_movements)
-    // cooldown_content += `<p class="exercise">- ${cooldown_movements[i]}</p>`;
+                for (const i in warmup_movements)
+                    warmup_content += `<p class="exercise">- ${warmup_movements[i]}</p>`;
+                for (const i in strength_movements)
+                    strength_content += `<p class="exercise">- ${strength_movements[i]}</p>`;
+                for (const i in wod_movements)
+                    wod_content += `<p class="exercise">- ${wod_movements[i]}</p>`;
+                for (const i in cooldown_movements)
+                    cooldown_content += `<p class="exercise">- ${cooldown_movements[i]}</p>`;
 
-    // document.getElementById("warmup_movements").innerHTML = warmup_content;
-    // document.getElementById("strength_movements").innerHTML = strength_content;
-    // document.getElementById("wod_movements").innerHTML = wod_content;
-    // document.getElementById("cooldown_movements").innerHTML = cooldown_content;
+                document.getElementById("warmup_movements").innerHTML = warmup_content;
+                document.getElementById("strength_movements").innerHTML = strength_content;
+                document.getElementById("wod_movements").innerHTML = wod_content;
+                document.getElementById("cooldown_movements").innerHTML = cooldown_content;
 
-    // });
-    // }
+            });
+    }
 
     // Call fetchData when the page loads
-    // window.onload = fetchData;
-
-</script>
-<script>
-
-async function fetchData() {
-    try {
-        const response = await fetch('http://localhost:3000/proxy'); // Add protocol
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        // Convert data to JSON string for display
-        document.getElementById("data").innerHTML = JSON.stringify(data, null, 2);
-    } catch (error) {
-        // Handle errors
-        document.getElementById("data").textContent = `Error: ${error.message}`;
-    }
-}
-
-// Call fetchData on window load
-window.onload = fetchData;
+    window.onload = fetchData;
 
 </script>
 

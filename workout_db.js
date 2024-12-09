@@ -1,85 +1,109 @@
-const { Pool } = require('pg');
+const { createClient } = require('@supabase/supabase-js');
 
 class Database {
     constructor() {
-        this.pool = new Pool({
-            user: 'postgres.rfwfgsjhvnpniknvhzng',
-            host: 'aws-0-us-east-1.pooler.supabase.com',
-            database: 'postgres',
-            password: 'xNj2tXnSOA6fnTi8',
-            port: 6543,
-        });
+        const supabaseUrl = 'https://rfwfgsjhvnpniknvhzng.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmd2Znc2podm5wbmlrbnZoem5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM0MjU3MzEsImV4cCI6MjA0OTAwMTczMX0.ga4eAXCvELr1SBAVI2siU-K1aXXdr6iw3VswxOjEsDE';
+        this.supabase = createClient(supabaseUrl, supabaseKey);
+
+        const database_start =
+            `
+            CREATE TABLE IF NOT EXISTS workouts (
+                id SERIAL PRIMARY KEY,
+                date_api VARCHAR(20) NOT NULL,
+                date VARCHAR(40) NOT NULL,
+
+                warmup_description VARCHAR(100) NOT NULL,
+                warmup_movements TEXT[],
+
+                strength_description VARCHAR(100) NOT NULL,
+                strength_movements TEXT[],
+
+                wod_description VARCHAR(100) NOT NULL,
+                wod_movements TEXT[],
+
+                cooldown_description VARCHAR(100) NOT NULL,
+                cooldown_movements TEXT[], 
+
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        `;
     }
 
-    // Delete all workouts
-    async creatWorkoutsDatabase() {
+
+    // Delete the workouts database table
+    async deleteWorkoutsTable() {
         try {
-            create_table_query = `
-                   CREATE TABLE IF NOT EXISTS workouts (
-            id SERIAL PRIMARY KEY,
-            date_api VARCHAR(20) NOT NULL,
-            date VARCHAR(40) NOT NULL,
+            const { error } = await this.supabase
+                .from('workouts')
+                .delete()
+                .neq('id', -1); // Deletes all rows, but keeps the table structure
 
-            warmup_description VARCHAR(100) NOT NULL,
-            warmup_movements VARCHAR(300)[],
-
-            strength_description VARCHAR(100) NOT NULL,
-            strength_movements VARCHAR(300)[],
-
-            wod_description VARCHAR(100) NOT NULL,
-            wod_movements VARCHAR(300)[],
-
-            cooldown_description VARCHAR(100) NOT NULL,
-            cooldown_movements VARCHAR(300)[], 
-
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-        `;
-            const result = await this.pool.query(`${create_table_query}`);
-            console.log(`Created workouts table sucessfully!`)
-            return result.rows;
-        } catch (error) {
-            console.error('Error creating workouts table:', error);
+            if (error) {
+                console.error('Error clearing workouts table:', error.message);
+            } else {
+                console.log('All rows in workouts deleted successfully!');
+            }
+        } catch (err) {
+            console.error('Unexpected error:', err.message);
         }
     }
 
+
+
+
     // Insert a user
-    async insertWorkout(warmup_description, warmup_movements, strength_description, strength_movements, wod_descriptions, wod_movements, cooldown_description, cooldown_movements) {
+    async insertWorkout(warmup_description, warmup_movements, strength_description, strength_movements, wod_description, wod_movements, cooldown_description, cooldown_movements) {
         const date_api = new Date().toLocaleDateString('en-US', { year: '2-digit', month: '2-digit', day: '2-digit' });
         const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
-
-        const query = 'INSERT INTO workouts (date_api, date, warmup_description, warmup_movements, strength_description, strength_movements, wod_description, wod_movements, cooldown_description, cooldown_movements) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *';
-        const values = [date_api, date, warmup_description, warmup_movements, strength_description, strength_movements, wod_descriptions, wod_movements, cooldown_description, cooldown_movements];
         try {
-            const res = await this.pool.query(query, values);
-            console.log("Workout inserted correctly!");
-            return res.rows[0];
+            // Insert data into the "workouts" table
+            const { data, error } = await this.supabase
+                .from('workouts')
+                .insert([
+                    {
+                        date_api,
+                        date,
+                        warmup_description,
+                        warmup_movements,
+                        strength_description,
+                        strength_movements,
+                        wod_description,
+                        wod_movements,
+                        cooldown_description,
+                        cooldown_movements
+                    }
+                ])
+                .select('*'); // Fetch the inserted row
+
+            if (error) {
+                console.error('Error inserting workout:', error.message);
+                return null;
+            }
+            console.log('Workout inserted successfully!');
+            return data[0];
         } catch (err) {
-            console.error('Error inserting user:', err.stack);
+            console.error('Unexpected error inserting workout:', err.message);
         }
     }
 
     // Fetch all users
     async fetchAllWorkouts() {
         try {
-            const res = await this.pool.query('SELECT * FROM workouts');
-            // console.log('Fetched users:', res.rows);
-            return res.rows;
+            const { data, error } = await this.supabase
+                .from('workouts')
+                .select('*');
+            if (error) {
+                console.error('Error fetching workouts:', error.message);
+                return null;
+            }
+            console.log(data);
+            return data; // Return the array of workouts
         } catch (err) {
-            console.error('Error fetching workouts:', err.stack);
+            console.error('Unexpected error fetching workouts:', err.message);
         }
     }
 
-    // Delete all workouts
-    async deleteAllWorkouts() {
-        try {
-            const result = await this.pool.query('DELETE FROM workouts RETURNING *');
-            console.log(`Deleted all workouts sucessfully!`)
-            return result.rows;
-        } catch (error) {
-            console.error('Error deleting users:', error);
-        }
-    }
+
 
     // Delete a specific workout by ID
     async deleteWorkout(id) {
@@ -87,23 +111,30 @@ class Database {
             throw new Error('Invalid workout ID.');
         }
         try {
-            const result = await this.pool.query('DELETE FROM workouts WHERE id = $1 RETURNING *', [id]);
-            console.log(`Deleted workout ${id} sucessfully!`);
-            return result.rows[0];
-        } catch (error) {
-            console.error('Error deleting user:', error);
+            // Use Supabase to delete a workout by ID
+            const { data, error } = await this.supabase
+                .from('workouts')
+                .delete()
+                .eq('id', id) // Match the specific ID
+
+            if (error) {
+                console.error('Error deleting workout:', error.message);
+                return null;
+            }
+
+            if (data.length === 0) {
+                console.log(`No workout found with ID ${id}.`);
+                return null;
+            }
+
+            console.log(`Deleted workout ${id} successfully!`);
+            return data[0]; // Return the deleted row
+        } catch (err) {
+            console.error('Unexpected error deleting workout:', err.message);
         }
     }
 
-    // Gracefully close the pool
-    async shutdown() {
-        try {
-            await this.pool.end();
-            console.log('Database pool closed');
-        } catch (err) {
-            console.error('Error closing pool:', err.stack);
-        }
-    }
+
 }
 
 
@@ -111,31 +142,32 @@ class Database {
 // main
 (async () => {
     const db = new Database();
+    await db.deleteWorkoutsTable();
 
 
+    const warmup_description = "Dynamic warmup";
+    const warmup_movements = ["Jumping jacks", "High knees"];
+    const strength_description = "Strength training";
+    const strength_movements = ["Bench press", "Deadlift"];
+    const wod_description = "Workout of the Day";
+    const wod_movements = ["Burpees", "Pull-ups"];
+    const cooldown_description = "Cooldown";
+    const cooldown_movements = ["Stretching", "Foam rolling"];
 
-    var warmup_movements = ["400m Run", "10 Air Squats", '10 Push-Ups', '10 PVC Pass-Throughts', '10 Good Mornings (lightweight or bodyweight)']
-    var strength_movements = ['Warm up to a challenging, but manageable weight (70 to 80 percent of 1RM)', 'Rest 2-3 minutes between sets', 'Focus on proper form: netural spine, strong lockout, and controlled descent']
-    var wod_movements = ['15 Thrusters (95/65) lb', '12 Pull-Ups (or scaled with banded pull-ups or ring rows)', '9 Deadlifts', '6 Burpee Box Jumps (24/20 in. box)', '400m Run']
-    var cooldown_movements = ['2 Minutes Child\'s Pose', '2 Minutes Pigeon Pose (each side)', 'Counch Stretch (30 seconds per leg)', 'Foam rolling for hamstrings, glutes, and back']
-
-
-    // operations
-    db.insertWorkout(
-        "2 Rounds:",
+    await db.insertWorkout(
+        warmup_description,
         warmup_movements,
-        "5x5 Deadlift",
+        strength_description,
         strength_movements,
-        "For Time (20-25 Minutes)",
+        wod_description,
         wod_movements,
-        "10 Minutes",
+        cooldown_description,
         cooldown_movements
-    )
+    );
 
-    // await db.fetchAllWorkouts();
-    // await db.deleteWorkout(1);
-    // await db.deleteAllWorkouts();
 
-    // shutdown
-    await db.shutdown();
+    // await db.deleteWorkout(16);
+    await db.fetchAllWorkouts();
+    // await db.deleteWorkoutsTable();
+
 })();

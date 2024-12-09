@@ -8,9 +8,14 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const fetchUsers = async () => {
   // Fetch all users
+  const today = new Date().toLocaleDateString('en-US', { year: '2-digit', month: '2-digit', day: '2-digit' });
+
+  // Fetch data from Supabase
   const { data, error } = await supabase
-    .from('users')  // Table name
-    .select('*');   // Select all columns
+    .from('workouts') // Table name
+    .select('*')      // Select all columns
+    .eq('date_api', today); // Match date column to today's date
+
 
   if (error) {
     console.error('Error fetching users:', error);
