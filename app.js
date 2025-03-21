@@ -55,8 +55,8 @@ app.get('/proxy', async (req, res) => {
 app.get('/secure-data', authenticateApiKey, async (req, res) => {
     try {
         // Initialize Supabase client
-        const supabaseUrl = 'https://rfwfgsjhvnpniknvhzng.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmd2Znc2podm5wbmlrbnZoem5nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM0MjU3MzEsImV4cCI6MjA0OTAwMTczMX0.ga4eAXCvELr1SBAVI2siU-K1aXXdr6iw3VswxOjEsDE';
+        const supabaseUrl = '';
+        const supabaseKey = '';
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         const today = new Date().toLocaleDateString('en-US', {
