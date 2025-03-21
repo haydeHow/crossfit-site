@@ -5,8 +5,8 @@ class Database {
     this.pool = new Pool({
       user: 'postgres.rfwfgsjhvnpniknvhzng',
       host: 'aws-0-us-east-1.pooler.supabase.com',
-      database: 'postgres',
-      password: 'xNj2tXnSOA6fnTi8',
+      database: '',
+      password: '',
       port: 6543,
     });
   }
